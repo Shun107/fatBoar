@@ -1,0 +1,459 @@
+<html>
+<head>
+<link href="common/stylesFiltresMulti.css" rel="stylesheet">
+<script src="plugin-frameworks/jquery-3.2.1.min.js"></script>
+<script src="plugin-frameworks/bootstrap.min.js"></script>
+</head>
+<body>
+<div id="wrapper">
+<h2 class="med-text">Découvrez</h2>
+<h3 class="bg-text">nos offres !</h3>
+<div class="rowOffre" style="margin-bottom: 50px;">
+	<div class="custom-select">
+		<div class="select-selected" id="custom-select-0">
+			<button id ="butPortee" class="filter-btn" type="button" data-toggle="dropdown" aria-expanded="false">Type de portée</button>
+			<ul id="menuPortee" class="dropdown-menu select-items">
+				<li onclick="showOffreByPortee('All', this)"><label><input type="radio" name="filterContract" value="0"> Tous</label></li>
+
+			</ul>
+		</div>
+	</div>
+
+	<div class="custom-select">
+		<div class="select-selected" id="custom-select-1">
+			<button id ="butContrat" class="filter-btn" type="button" data-toggle="dropdown" aria-expanded="false">Type de contrat</button>
+			<ul id="menuContrat" class="dropdown-menu select-items">
+				<li onclick="showOffreByContrat('All', this)"><label><input type="radio" name="filterContract" value="0"> Tous</label></li>
+
+			</ul>
+		</div>
+	</div>
+
+
+	<div class="custom-select">
+		<div class="select-selected" id="custom-select-2">
+			<button id ="butDep" class="filter-btn" type="button" data-toggle="dropdown" aria-expanded="false">Département</button>
+			<ul id="menuDepartement" class="dropdown-menu select-items">
+				<li onclick="showOffreByDep('All', this)"><label><input type="radio" name="filterContract" value="0"> Tous</label></li>
+
+			</ul>
+		</div>
+	</div>
+
+
+	<div class="custom-select">
+		<div class="select-selected" id="custom-select-3">
+			<button id ="butSecteur" class="filter-btn" type="button" data-toggle="dropdown" aria-expanded="false">Secteur d'activité</button>
+			<ul id="menuSecteur" class="dropdown-menu select-items">
+				<li onclick="showOffreBySecteur('All', this)"><label><input type="radio" name="filterSector" value="0"> Tous</label></li>
+			</ul>
+		</div>
+	</div>
+	
+</div>
+<div id="contentOffre" class="row news-raw">
+	
+</div>
+
+	<ul id="pagin"></ul>
+
+	<div id="numberTeam">
+	</div>
+</div>
+</body>
+
+<script>
+	
+	var tabContrat = [];
+	var tabDepart = [];
+	var tabSecteur = [];
+	var tabPortee= [];
+	var varContrat = "All";
+	var varDep = "All";
+	var varSecteur = "All";
+	var varPortee = "All";
+	
+	var username = "Admin";
+	var password = "FKDjshdf876jh6^%shj";
+	var proxy = 'https://cors-anywhere.herokuapp.com/';
+	var requestUri = "https://dev.viapost-sl.club/api/login_check";
+	var data;
+	
+	jQuery.ajax({
+	url: requestUri,
+	dataType: "json",
+	type: 'post',
+	data: {
+		"_username": "Admin",
+		"_password": "FKDjshdf876jh6^%shj"
+	},
+	success: function(result){	
+	    console.log(result.token);
+	    jQuery.ajax({
+	    type: 'POST',
+		url: 'https://dev.viapost-sl.club/api/job/list/all',
+		dataType: 'json',
+		crossDomain: true,
+		headers: {
+			'Authorization': 'Bearer ' + result.token
+		},
+		success: function (result) {
+		data = result.data;
+	
+	for(var i = 0; i < data.length; i++){
+		if (tabContrat.indexOf(data[i].contract) === -1){
+			tabContrat.push(data[i].contract);
+		}
+		if (tabDepart.indexOf(data[i].department) === -1){
+			tabDepart.push(data[i].department);
+		}
+		if (tabSecteur.indexOf(data[i].sector) === -1){
+			tabSecteur.push(data[i].sector);
+		}
+		
+		if (tabPortee.indexOf(data[i].Scope) === -1){
+			tabPortee.push(data[i].Scope);
+		}
+		showOffre(data,i);
+	}
+	pagination(data);
+	
+	tabDepart.sort();
+
+	for(var j = 0; j < tabContrat.length; j++){
+			var liContrat = document.createElement("li");
+			liContrat.setAttribute("onclick", "showOffreByContrat('"+ tabContrat[j] +"', this)");
+			var label = document.createElement("label");
+			liContrat.appendChild(label);
+			var input = document.createElement("input");
+			input.setAttribute("type", "radio");
+			input.setAttribute("name", "filterContract");
+			input.setAttribute("value", j+1);
+			label.appendChild(input);
+			label.appendChild(document.createTextNode(" "+tabContrat[j]));
+			
+			jQuery("#menuContrat").append(liContrat);
+	}
+	
+	for(var k = 0; k < tabDepart.length; k++){
+			var liDepart = document.createElement("li");
+			liDepart.setAttribute("onclick", 'showOffreByDep("'+ tabDepart[k] +'", this)');
+			var label = document.createElement("label");
+			liDepart.appendChild(label);
+			var input = document.createElement("input");
+			input.setAttribute("type", "radio");
+			input.setAttribute("name", "filterContract");
+			input.setAttribute("value", k+1);
+			label.appendChild(input);
+			label.appendChild(document.createTextNode(" "+tabDepart[k]));
+			
+			jQuery("#menuDepartement").append(liDepart);
+	}
+	
+	for(var l = 0; l < tabSecteur.length; l++){
+			var liSecteur = document.createElement("li");
+			liSecteur.setAttribute("onclick", "showOffreBySecteur('"+ tabSecteur[l] +"', this)");
+			var label = document.createElement("label");
+			liSecteur.appendChild(label);
+			var input = document.createElement("input");
+			input.setAttribute("type", "radio");
+			input.setAttribute("name", "filterContract");
+			input.setAttribute("value", l+1);
+			label.appendChild(input);
+			label.appendChild(document.createTextNode(" "+tabSecteur[l]));
+			
+			jQuery("#menuSecteur").append(liSecteur);
+	}
+	
+	for(var m = 0; m < tabPortee.length; m++){
+			var liPortee = document.createElement("li");
+			liPortee.setAttribute("onclick", "showOffreByPortee('"+ tabPortee[m] +"', this)");
+			var label = document.createElement("label");
+			liPortee.appendChild(label);
+			var input = document.createElement("input");
+			input.setAttribute("type", "radio");
+			input.setAttribute("name", "filterContract");
+			input.setAttribute("value", m+1);
+			label.appendChild(input);
+			label.appendChild(document.createTextNode(" "+tabPortee[m]));
+			
+			jQuery("#menuPortee").append(liPortee);
+	}
+	
+	
+	displayMenu("custom-select-1","menuContrat");
+	displayMenu("custom-select-2","menuDepartement");
+	displayMenu("custom-select-3","menuSecteur");
+	displayMenu("custom-select-0","menuPortee");
+	
+	},
+	   error: function (error) {
+			alert("no");
+	   }
+	});
+	},
+	error: function (e) {
+		alert("erreur");
+		console.log(e);               
+	}
+});
+	function displayMenu(id, ul){
+		jQuery("#"+id).click(function() {
+			if(document.getElementById(ul).style.display == "none"){
+				document.getElementById(ul).style.display = "block";
+				document.getElementById(id).style.borderRadius = "25px 25px 0px 0px";
+			}else{
+				document.getElementById(ul).style.display = "none";
+				document.getElementById(id).style.borderRadius = "50px";
+			}
+		});
+		
+		
+	}
+	
+	
+	function showOffreByContrat(contract, myElement){
+		varContrat = contract;
+		
+		document.getElementById("contentOffre").innerHTML = "";
+		document.getElementById("butContrat").innerHTML = "";
+		if(contract == "All"){
+			document.getElementById("butContrat").innerHTML = "Tous";
+		}
+		else{
+			document.getElementById("butContrat").innerHTML = contract;
+		}
+
+		for(var i = 0; i < data.length; i++){
+			if (data[i].contract === varContrat){
+				filtre(varDep, varSecteur, data[i].department, data[i].sector, varPortee, i);
+			}
+			else if (varContrat === "All"){
+				filtre(varDep, varSecteur, data[i].department, data[i].sector, varPortee, i);
+			}
+		}
+		pagination(data);
+	}
+	
+	function showOffreByDep(department, myElement){
+		varDep = department;
+		document.getElementById("contentOffre").innerHTML = "";
+		document.getElementById("butDep").innerHTML = "";
+		if(department == "All"){
+			document.getElementById("butDep").innerHTML = "Tous";
+		}
+		else{
+			document.getElementById("butDep").innerHTML = department;
+		}
+		for(var i = 0; i < data.length; i++){
+			if (data[i].department === varDep){
+				alert(varDep);
+				filtre(varContrat, varSecteur, data[i].contract, data[i].sector, varPortee, i);
+			}
+			else if (varDep === "All"){
+				filtre(varContrat, varSecteur, data[i].contract, data[i].sector, varPortee, i);
+			}
+		}
+		pagination(data);
+		
+	}
+	
+	function showOffreBySecteur(sector, myElement){
+		varSecteur = sector;
+		document.getElementById("contentOffre").innerHTML = "";
+		document.getElementById("butSecteur").innerHTML = "";
+		if(sector == "All"){
+			document.getElementById("butSecteur").innerHTML = "Tous";
+		}
+		else{
+			document.getElementById("butSecteur").innerHTML = sector;
+		}
+		for(var i = 0; i < data.length; i++){
+			if (data[i].sector === varSecteur){
+				filtre(varDep, varContrat, data[i].department, data[i].contract, varPortee, i);
+			}
+			else if (varSecteur === "All"){
+				filtre(varDep, varContrat, data[i].department, data[i].contract, varPortee, i);
+			}
+		}
+		pagination(data);
+	}
+	
+	
+	function showOffreByPortee(portee, myElement){
+		varPortee = portee;
+		document.getElementById("contentOffre").innerHTML = "";
+		document.getElementById("butPortee").innerHTML = "";
+		if(portee == "All"){
+			document.getElementById("butPortee").innerHTML = "Tous";
+		}
+		else{
+			document.getElementById("butPortee").innerHTML = portee;
+		}
+		for(var i = 0; i < data.length; i++){
+			if (data[i].sector === varSecteur){
+				filtre(varDep, varContrat, data[i].department, data[i].contrat, varPortee, i);
+			}
+			else if (varSecteur === "All"){
+				filtre(varDep, varContrat, data[i].department, data[i].contrat, varPortee, i);
+			}
+		}
+	}
+	
+	
+	function filtre(var1, var2, offre1, offre2, var3, i){
+		if(var1 != "All" && var2 != "All"){
+			if((offre1 === var1) && (offre2 === var2)){
+				showOffrePortee(data,i, var3);
+			}
+			
+		}
+		else if(var1 != "All"){
+			if(offre1 === var1){
+				showOffrePortee(data,i, var3);
+			}
+			
+		}
+		else if(var2 != "All"){
+			if(offre2 === var2){
+				showOffrePortee(data,i, var3);
+			}
+		}
+		else {
+			showOffrePortee(data,i, var3);
+		}
+	}
+	
+	function showOffrePortee(data,i, portee){
+		if (portee === "All"){
+			showOffre(data, i);
+		}else{
+			if(data[i].Scope === portee){
+				showOffre(data,i);
+			}
+		}
+	}
+	
+	function showOffre(data,i){
+		var col = document.createElement("div");
+		col.setAttribute("class", "col-4 col-12 paginElement");
+		var post = document.createElement("div");
+		post.setAttribute("class", "post-blck float reveal");
+		col.appendChild(post);
+		var postImg = document.createElement("div");
+		postImg.setAttribute("class", "post-img float");
+		post.appendChild(postImg);
+		var aFirst = document.createElement("a");
+		aFirst.setAttribute("href", "/Pages/Carriere.aspx?%24id=" + data[i].id);
+		//aFirst.setAttribute("target", "_blank");
+		postImg.appendChild(aFirst);
+		var img = document.createElement("img");
+		img.setAttribute("class", "img-responsive");
+		img.setAttribute("src", data[i].image);	
+		aFirst.appendChild(img);
+		var blogcon = document.createElement("div");
+		blogcon.setAttribute("class", "offer-conn float");
+		var job = document.createElement("div");
+		job.setAttribute("class", "job-title-wrapper");
+		blogcon.appendChild(job);
+		post.appendChild(blogcon);
+		var ligne = document.createElement("div");
+		ligne.setAttribute("class", "row");
+		job.appendChild(ligne);
+		var posteRow = document.createElement("div");
+		posteRow.setAttribute("class", "posteRow");
+		ligne.appendChild(posteRow);
+		var aSecond = document.createElement("a");
+		aSecond.setAttribute("href", "/Pages/Carriere.aspx?%24id=" + data[i].id);
+		aSecond.appendChild(document.createTextNode(data[i].title));
+		var h5 = document.createElement("h5");
+		h5.appendChild(aSecond);
+		posteRow.appendChild(h5);
+		var contract = document.createElement("div");
+		contract.setAttribute("class", "contrat");
+		ligne.appendChild(contract);
+		var span = document.createElement("span");
+		span.setAttribute("class", "tag");
+		span.appendChild(document.createTextNode(data[i].contract));
+		var h5second = document.createElement("h5");
+		h5second.appendChild(document.createTextNode(data[i].title));
+		h5second.appendChild(span);
+		contract.appendChild(h5second);
+		var ligneSecond = document.createElement("div");
+		ligneSecond.setAttribute("class", "row");
+		blogcon.appendChild(ligneSecond);
+		var department = document.createElement("div");
+		department.setAttribute("class", "departement");
+		var aThird = document.createElement("a");
+		aThird.setAttribute("href", "/Pages/Carriere.aspx?%24id=" + data[i].id);
+		//aThird.setAttribute("target", "_blank");
+		aThird.appendChild(document.createTextNode(data[i].department));
+		department.appendChild(aThird);
+		ligneSecond.appendChild(department);
+		var ligneThird = document.createElement("div");
+		ligneThird.setAttribute("class", "row");
+		blogcon.appendChild(ligneThird);
+		var sector = document.createElement("div");
+		sector.setAttribute("class", "secteur2");
+		var h6 = document.createElement("h6");
+		h6.appendChild(document.createTextNode(data[i].sector));
+		sector.appendChild(h6);
+		ligneThird.appendChild(sector);
+		var portee = document.createElement("div");
+		portee.setAttribute("class", "portee");
+		portee.appendChild(document.createTextNode(data[i].Scope));
+		blogcon.appendChild(portee);
+		var btnPrimary = document.createElement("a");
+		btnPrimary.setAttribute("class", "btn-primary btn-blue");
+		btnPrimary.setAttribute("href", "/Pages/Carriere.aspx?%24id=" + data[i].id);
+		//yyybtnPrimary.setAttribute("target", "_blank");
+		btnPrimary.setAttribute("rel", "nofollow");
+		var spanButton = document.createElement("span");
+		spanButton.appendChild(document.createTextNode("Consulter l'annonce"));
+		btnPrimary.appendChild(spanButton);
+		blogcon.appendChild(btnPrimary);
+		jQuery(".news-raw").append(col);
+	}
+	
+	function pagination(data){
+		document.getElementById("pagin").innerHTML = "";
+		
+		pageSize = 6;
+
+		var pageCount =  jQuery(".paginElement").length / pageSize;
+		for(var i = 0 ; i <pageCount;i++){
+			jQuery("#pagin").append('<li><a class="pageNumber" href="#">'+(i+1)+'</a></li> ');
+		}
+        
+        
+        document.getElementById("numberTeam").innerHTML = "";
+        var numberTeam = document.createElement("p");
+		numberTeam.appendChild(document.createTextNode(jQuery(".paginElement").length +" offres" ));
+		jQuery('#numberTeam').append(numberTeam);
+        
+		jQuery("#pagin li").first().find("a").addClass("current")
+		showPage = function(page) {
+			jQuery(".paginElement").hide();
+			jQuery(".paginElement").each(function(n) {
+			if (n >= pageSize * (page - 1) && n < pageSize * page)
+				jQuery(this).show();
+			});        
+		}
+
+		showPage(1);
+
+		jQuery("#pagin li a").click(function() {
+			jQuery("#pagin li a").removeClass("current");
+			jQuery(this).addClass("current");
+			showPage(parseInt(jQuery(this).text())) 
+		});
+	}
+	
+	function truncateString(str, num) {
+	  if (str.length <= num) {
+		return str
+	  }
+	  return str.slice(0, num) + '...'
+	}
+ </script>
+</html>
