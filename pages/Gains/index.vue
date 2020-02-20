@@ -1,4 +1,5 @@
 <template>
+
     <div class="container">
         <div id="wrapper">
         <h2 class="med-text"  v-on:click="test">Du nouveau</h2>
@@ -148,10 +149,6 @@
     box-shadow: none;
 }
 
-.news-raw{
-	
-}
-
 .news-raw > div {
     margin-top: 2.5%;
     width: 31%;
@@ -211,7 +208,6 @@
     font-weight: 600;
 	margin-left: 20px;
 }
-
 .public {
 	float: right;
     background: #ec6608;
@@ -324,11 +320,9 @@ h6 {
 
 <script>
 
-export default {
-methods: 
-    {
-        test(){
-            var username = "Admin";
+if (process.browser) {
+  window.onNuxtReady((app) => {
+       var username = "Admin";
             var password = "FKDjshdf876jh6^%shj";
             var proxy = 'https://cors-anywhere.herokuapp.com/';
             var requestUri = "https://www.viapost.fr/api/login_check";
@@ -632,6 +626,7 @@ methods:
             function custom_sort(a, b) {
                 return new Date(a.post_date).getTime() - new Date(b.post_date).getTime();
             }
+
 	
 	function strip_tags(html)
 {
@@ -654,42 +649,13 @@ var clean_string = html;
 //RETURN THE CLEAN STRING
 return clean_string;
 }
-        },
-        showActuByCat(categorie, myElement){
-		varCategorie = categorie;
-		console.log(categorie);
 
-		var current = document.getElementsByClassName("activeCat");
-		current[0].className = current[0].className.replace("activeCat", "");
-		jQuery(myElement).addClass("activeCat");
-		document.getElementById("contentActu").style.display = "none";
-		document.getElementById("contentActu").innerHTML = "";
-		if (categorie == "All"){
-			for(var i = 0; i < data.length; i++){
-				if(varPortee == "All"){
-					showActu(data,i);
-				}
-				else if(data[i].Scope == varPortee){
-					showActu(data,i);
-				}
-			}
-			pagination(data);
-		}else{
-			for(var i = 0; i < data.length; i++){
-				if (data[i].category == categorie){
-					if (data[i].category == categorie){
-						if(varPortee == "All"){
-							showActu(data,i);
-						}else if (data[i].Scope == varPortee)
-						{
-							showActu(data,i);
-						}
-					}
-				}
-			}
-			pagination(data);
-		}
-	}
+  })
+}
+export default {
+methods: 
+    {
+        
     }
 }
 

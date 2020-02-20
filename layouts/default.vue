@@ -10,8 +10,8 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item href="#">Accueil</b-nav-item>
-          <b-nav-item href="#">Lots</b-nav-item>
-          <b-nav-item href="#">Burgers</b-nav-item>
+          <b-nav-item href="/Gains">Lots</b-nav-item>
+          <b-nav-item href="/Menu">Burgers</b-nav-item>
         </b-navbar-nav>
 
         <!-- Right aligned nav items -->
